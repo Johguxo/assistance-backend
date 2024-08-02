@@ -20,18 +20,23 @@ let _db = null;
 
 async function connectDB() {
   if (!_db) {
-    const connectionString = process.env.MONGODB_URI;
-    const nameDB = process.env.DB_NAME;
-    console.log(`Connecting to database ${connectionString} and db ${nameDB}`);
+    try {
+      const connectionString = process.env.MONGODB_URI;
+      const nameDB = process.env.DB_NAME;
+      console.log(`Connecting to database ${connectionString} and db ${nameDB}`);
 
-    const client = new MongoClient(connectionString, {
-      // useNewUrlParser: true,
-      // useUnifiedTopology: true,
-    });
+      const client = new MongoClient(connectionString, {
+        // useNewUrlParser: true,
+        // useUnifiedTopology: true,
+      });
 
-    await client.connect();
+      await client.connect();
 
-    _db = client.db("database-jaj");
+      _db = client.db("database-jaj");
+    } catch (e) {
+      console.log("Error:", e)
+    }
+    
     // const usersCollection = _db.collection('users');
     // const users = await usersCollection.find().toArray();
     // console.log('Usuarios encontrados:', users);
