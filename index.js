@@ -17,6 +17,7 @@
 import cors from 'cors'
 import express from 'express';
 import users from './routes/users.js';
+import data from './routes/data.js';
 import institutions from './routes/institutions.js';
 import deaneries from './routes/deaneries.js';
 import vicars from './routes/vicars.js';
@@ -28,6 +29,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors())
 app.use(express.json());
 app.use('/users', users);
+app.use('/data', data);
 app.use('/institutions', institutions);
 app.use('/deaneries', deaneries);
 app.use('/vicars', vicars);

@@ -37,6 +37,11 @@ router.get('/', async (req, res) => {
               },
             },
           },
+          {
+            $sort: {
+              name: 1,
+            },
+          },
         ])
         .toArray();
       console.log("Get list of institutions sucessfully")
