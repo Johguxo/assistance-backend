@@ -1,6 +1,5 @@
 import express from "express";
 import { connectDB } from "../db/conn.js";
-import { ObjectId } from "mongodb";
 
 const router = express.Router();
 
@@ -24,7 +23,12 @@ router.get("/", async (req, res) => {
             preserveNullAndEmptyArrays: true,
           },
         },
+        {
+          $match: {
+            isLeader: true,
 
+          },
+        },
         {
           $group: {
             _id: "$_id",
@@ -47,6 +51,7 @@ router.get("/", async (req, res) => {
             have_auth: { $first: "$have_auth" },
             saturday: { $first: "$saturday" },
             sunday: { $first: "$sunday" },
+            area: { $first: "$area" } 
           },
         },
         {
@@ -56,8 +61,53 @@ router.get("/", async (req, res) => {
         },
       ])
       .toArray();
-    console.log("Get list of users sucessfully");
-    res.status(200).json(results);
+
+    
+    const dataTotalInscriptions = results.filter(user => user.saturday === true);
+    const dataAssistancesRaw = results.filter(user => user)
+
+    const areas = [
+      "COMUNICACIONES",
+      "Coro Juvenil Arquidiocesano",
+      "Animación y adoración ",
+      "DANZA",
+      "REGISTRO Y ESTADÍSTICA"
+    ];
+
+  
+    const areaCounts = areas.reduce((acc, area) => {
+      acc[area] = dataTotalInscriptions.filter(user => user.area === area).length;
+      return acc;
+    }, {});
+
+    const areaCountsAssitances = areas.reduce((acc, area) => {
+      acc[area] = dataAssistancesRaw.filter(user => user.area === area).length;
+      return acc;
+    }, {});
+
+    const labelsTotalInscriptions = Object.keys(areaCounts);
+    const dataTotalInscriptionsPerArea = Object.values(areaCounts);
+
+
+    const dataAssistances = Object.values(areaCountsAssitances);
+    
+    const labelsAssistances = Object.keys(areaCountsAssitances);
+
+    const resultsGraphs = [
+      {
+        data: dataTotalInscriptionsPerArea, 
+        labels: labelsTotalInscriptions    
+      },
+      {
+        data: dataAssistances, 
+        labels: labelsAssistances   
+      },
+
+    ];
+
+    console.log(results);
+    console.log("Get list of users successfully");
+    res.status(200).json(resultsGraphs);
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ message: "Internal Server Error" });

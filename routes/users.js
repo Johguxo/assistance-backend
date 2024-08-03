@@ -89,7 +89,7 @@ router.get("/leaders", async (req, res) => {
         },
         {
           $match: {
-            isLeader: true, // Filtra por el campo isLeader
+            isLeader: true,// Filtra por el campo isLeader
           },
         },
         {
