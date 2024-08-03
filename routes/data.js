@@ -71,27 +71,28 @@ router.get("/", async (req, res) => {
       "Coro Juvenil Arquidiocesano",
       "Animación y adoración ",
       "DANZA",
-      "REGISTRO Y ESTADÍSTICA"
+      "REGISTRO Y ESTADÍSTICA",
+      "Facilitadores",
+      "Producción (Logística)",
+      "Seguridad"
     ];
 
   
     const areaCounts = areas.reduce((acc, area) => {
-      acc[area] = dataTotalInscriptions.filter(user => user.area === area).length;
+      acc[area] = dataTotalInscriptions.filter(user => user.area?.toLowerCase().trim() === area.toLowerCase().trim()).length;
       return acc;
     }, {});
-
-    const areaCountsAssitances = areas.reduce((acc, area) => {
-      acc[area] = dataAssistancesRaw.filter(user => user.area === area).length;
-      return acc;
-    }, {});
-
+    
     const labelsTotalInscriptions = Object.keys(areaCounts);
     const dataTotalInscriptionsPerArea = Object.values(areaCounts);
 
+    const areaCountsAssitances = areas.reduce((acc, area) => {
+      acc[area] = dataAssistancesRaw.filter(user => user.area?.toLowerCase().trim() === area.toLowerCase().trim()).length;
+      return acc;
+    }, {});
 
-    const dataAssistances = Object.values(areaCountsAssitances);
-    
     const labelsAssistances = Object.keys(areaCountsAssitances);
+    const dataAssistances = Object.values(areaCountsAssitances);
 
     const resultsGraphs = [
       {
@@ -102,11 +103,8 @@ router.get("/", async (req, res) => {
         data: dataAssistances, 
         labels: labelsAssistances   
       },
-
     ];
-
-    console.log(results);
-    console.log("Get list of users successfully");
+    console.log("Get list stadistics of users successfully");
     res.status(200).json(resultsGraphs);
   } catch (error) {
     console.error("Error fetching users:", error);

@@ -144,13 +144,14 @@ router.post("/", async (req, res) => {
       DNI: parseInt(dni),
       phone: parseInt(phone),
       date_birth: new Date(date_birth),
-      age: getAge(date_birth)
+      age: getAge(date_birth),
+      saturday: true
     }
     if (body.institution) {
       const { institution, ...restBody } = userBody;
       userBody = {
         ...restBody,
-        institution_id: institution
+        institution_id: new ObjectId(institution)
       }
     }
     const user = await collection.insertOne(userBody);
