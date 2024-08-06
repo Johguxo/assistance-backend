@@ -66,6 +66,91 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.post("/by-admin", async (req, res) => {
+  const body = req.body;
+
+  try {
+    const db = await connectDB();
+    const collection = db.collection("users");
+    console.log(body)
+    /*const { belongsToInstitution, typeInstitution, dni, phone, date_birth, ...destructuredBody } = body;
+    let userBody = {
+      ...destructuredBody,
+      DNI: parseInt(dni),
+      phone: parseInt(phone),
+      date_birth: new Date(date_birth),
+      age: getAge(date_birth),
+      saturday: true,
+      have_auth: true
+    }
+    
+    if (body.institution) {
+      const { institution, ...restBody } = userBody;
+      userBody = {
+        ...restBody,
+        institution_id: new ObjectId(institution)
+      }
+    }
+    const user = await collection.insertOne(userBody);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }*/
+    const user = body
+    console.log("User created sucessfully");
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/by-user", async (req, res) => {
+  const body = req.body;
+
+  try {
+    const db = await connectDB();
+    const collection = db.collection("users");
+    console.log(body)
+    const { belongsToInstitution, typeInstitution, dni, phone, date_birth, institution, ...destructuredBody } = body;
+    let userBody = {
+      ...destructuredBody,
+      DNI: parseInt(dni),
+      phone: parseInt(phone),
+      date_birth: new Date(date_birth),
+      age: getAge(date_birth)
+    }
+
+    if (belongsToInstitution === "Yes") {
+      if (institution != 'default') {
+        userBody = {
+          ...userBody,
+          institution_id: new ObjectId(institution)
+        }
+      }
+    }
+
+    if (userBody.age <= 18) {
+      userBody = {
+        ...userBody,
+        have_auth: false
+      }
+    }
+
+    console.log(userBody)
+
+    /*const user = await collection.insertOne(userBody);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }*/
+    const user = userBody
+    console.log("User created sucessfully");
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 router.get("/leaders", async (req, res) => {
   try {
     const db = await connectDB();
@@ -132,7 +217,7 @@ router.get("/leaders", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/leaders", async (req, res) => {
   const body = req.body;
 
   try {
