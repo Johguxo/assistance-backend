@@ -52,4 +52,50 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.post("/by-user", async (req, res) => {
+  const body = req.body;
+
+  try {
+    const db = await connectDB();
+    const collection = db.collection("institutions");
+    const customBody = {
+      ...body,
+      created_by_user: true
+    }
+    const result = await collection.insertOne(customBody);
+    const insertedInstitution = {
+      _id: result.insertedId,
+      ...body
+    };
+    console.log("Institution created sucessfully");
+    res.status(201).json(insertedInstitution);
+  } catch (error) {
+    console.error("Error creating institution:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/by-admin", async (req, res) => {
+  const body = req.body;
+
+  try {
+    const db = await connectDB();
+    const collection = db.collection("institutions");
+    const customBody = {
+      ...body,
+      created_by_admin: true
+    }
+    const result = await collection.insertOne(customBody);
+    const insertedInstitution = {
+      _id: result.insertedId,
+      ...body
+    };
+    console.log("Institution created sucessfully");
+    res.status(201).json(insertedInstitution);
+  } catch (error) {
+    console.error("Error creating institution:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 export default router;  

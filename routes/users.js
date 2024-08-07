@@ -26,7 +26,15 @@ router.get("/", async (req, res) => {
             preserveNullAndEmptyArrays: true, // This allows users without institutions to be included
           },
         },
-
+        {
+          $match: {
+            $or: [
+              { isLeader: false },
+              { isLeader: { $exists: false } },
+              { isLeader: null }
+            ]
+          },
+        },
         {
           $group: {
             _id: "$_id",
@@ -72,32 +80,36 @@ router.post("/by-admin", async (req, res) => {
   try {
     const db = await connectDB();
     const collection = db.collection("users");
-    console.log(body)
-    /*const { belongsToInstitution, typeInstitution, dni, phone, date_birth, ...destructuredBody } = body;
+    const { belongsToInstitution, typeInstitution, dni, phone, date_birth, institution, ...destructuredBody } = body;
     let userBody = {
       ...destructuredBody,
       DNI: parseInt(dni),
       phone: parseInt(phone),
       date_birth: new Date(date_birth),
       age: getAge(date_birth),
-      saturday: true,
-      have_auth: true
+      created_by_admin: true,
     }
-    
-    if (body.institution) {
-      const { institution, ...restBody } = userBody;
-      userBody = {
-        ...restBody,
-        institution_id: new ObjectId(institution)
+
+    if (belongsToInstitution === "Yes") {
+      if (institution != null) {
+        userBody = {
+          ...userBody,
+          institution_id: new ObjectId(institution._id)
+        }
       }
     }
+
+    if (userBody.age <= 18) {
+      userBody = {
+        ...userBody,
+        have_auth: true
+      }
+    }
+
     const user = await collection.insertOne(userBody);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }*/
-    const user = body
+    //const user = userBody;
     console.log("User created sucessfully");
-    res.status(200).json(user);
+    res.status(201).json(user);
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -110,21 +122,21 @@ router.post("/by-user", async (req, res) => {
   try {
     const db = await connectDB();
     const collection = db.collection("users");
-    console.log(body)
     const { belongsToInstitution, typeInstitution, dni, phone, date_birth, institution, ...destructuredBody } = body;
     let userBody = {
       ...destructuredBody,
       DNI: parseInt(dni),
       phone: parseInt(phone),
       date_birth: new Date(date_birth),
-      age: getAge(date_birth)
+      age: getAge(date_birth),
+      created_by_user: true,
     }
 
     if (belongsToInstitution === "Yes") {
-      if (institution != 'default') {
+      if (institution != null) {
         userBody = {
           ...userBody,
-          institution_id: new ObjectId(institution)
+          institution_id: new ObjectId(institution._id)
         }
       }
     }
@@ -136,17 +148,11 @@ router.post("/by-user", async (req, res) => {
       }
     }
 
-    console.log(userBody)
-
-    /*const user = await collection.insertOne(userBody);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }*/
-    const user = userBody
+    const user = await collection.insertOne(userBody);
     console.log("User created sucessfully");
-    res.status(200).json(user);
+    res.status(201).json(user);
   } catch (error) {
-    console.error("Error fetching users:", error);
+    console.error("Error creating user:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
@@ -243,10 +249,10 @@ router.post("/leaders", async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    console.log("User created sucessfully");
-    res.status(200).json(user);
+    console.log("User leader created sucessfully");
+    res.status(201).json(user);
   } catch (error) {
-    console.error("Error fetching users:", error);
+    console.error("Error createing user leader:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
