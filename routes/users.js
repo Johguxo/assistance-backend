@@ -87,6 +87,7 @@ router.post("/by-admin", async (req, res) => {
       phone: parseInt(phone),
       date_birth: new Date(date_birth),
       age: getAge(date_birth),
+      saturday: true,
       created_by_admin: true,
     }
 
