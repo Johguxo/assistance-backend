@@ -109,13 +109,13 @@ router.get("/", async (req, res) => {
 
     const resultsGraphs = [
       {
-        data: dataTotalInscriptionsPerArea, 
-        labels: labelsTotalInscriptions    
-      },
-      {
         data: dataAssistancesPerArea, 
         labels: labelsAssistances   
       },
+      {
+        data: dataTotalInscriptionsPerArea, 
+        labels: labelsTotalInscriptions    
+      }
     ];
     console.log("Get list stadistics of users successfully");
     res.status(200).json(resultsGraphs);
