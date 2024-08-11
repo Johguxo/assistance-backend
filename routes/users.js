@@ -285,9 +285,10 @@ router.patch("/:id", async (req, res) => {
   try {
     const db = await connectDB();
     const collection = db.collection("users");
+    const currentDate = new Date();
     const result = await collection.updateOne(
       { _id: new ObjectId(id) },
-      { $set: updateFields }
+      { $set: {...updateFields, update_at: currentDate } }
     );
     if (result.matchedCount === 0) {
       return res.status(404).json({ message: "User not found" });
