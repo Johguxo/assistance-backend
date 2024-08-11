@@ -87,7 +87,8 @@ router.post("/by-admin", async (req, res) => {
       phone: parseInt(phone),
       date_birth: new Date(date_birth),
       age: getAge(date_birth),
-      saturday: true,
+      //saturday: true,
+      sunday: true,
       created_by_admin: true,
     }
 
@@ -295,6 +296,33 @@ router.patch("/:id", async (req, res) => {
     res.status(200).json({ message: "User updated successfully" });
   } catch (error) {
     console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+router.post("/fix", async (req, res) => {
+  const body = req.body;
+
+  try {
+    const db = await connectDB();
+    const collection = db.collection("users");
+    // Encontrar todos los documentos que cumplen con la condición
+    const users = await collection.find({ created_by_admin: true }).toArray();
+
+    // Iterar sobre cada documento encontrado
+    for (const user of users) {
+      const userId = user._id;  // Obtener el ID del usuario
+      await collection.updateOne(
+        { _id: userId },  // Filtrar por el ID del usuario actual
+        { $set: { saturday: true } }  // Actualizar el atributo 'saturday'
+      );
+      console.log(`Usuario con ID ${userId} actualizado.`);
+    }
+
+    console.log("Users fixed successfully");
+    res.status(200).json("Success");
+  } catch (error) {
+    console.error("Error createing user leader:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });

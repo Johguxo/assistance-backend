@@ -68,9 +68,11 @@ router.get("/", async (req, res) => {
     
     const dataTotalInscriptions = results.filter(user => user);
     const dataAssistancesRaw = results.filter(user => user.saturday === true)
+    const dataAssistancesRawSunday = results.filter(user => user.sunday === true)
 
     const totalUsers = dataTotalInscriptions.length
     const totalAssistancesUsers = dataAssistancesRaw.length
+    const totalAssistancesUsersSunday = dataAssistancesRawSunday.length
 
     const types = [
       1,
@@ -96,6 +98,16 @@ router.get("/", async (req, res) => {
     const labelsAssistances = ['Parroquias', 'Colegios', 'Universidades', 'Movimientos', 'Libres'];
     const dataAssistancesPerArea = Object.values(typeCountsAssitances);
 
+    const typeCountsAssitancesSunday = types.reduce((acc, type) => {
+      acc[type] = dataAssistancesRawSunday.filter(user => user.institution.type === type).length;
+      return acc;
+    }, {});
+
+    const labelsAssistancesSunday = ['Parroquias', 'Colegios', 'Universidades', 'Movimientos', 'Libres'];
+    const dataAssistancesSundayPerArea = Object.values(typeCountsAssitancesSunday);
+
+    //Next
+
     const sumaOtros = dataTotalInscriptionsPerArea.reduce((valorAnterior, valorActual) => {
       return valorAnterior + valorActual;
     }, 0);
@@ -104,13 +116,23 @@ router.get("/", async (req, res) => {
       return valorAnterior + valorActual;
     }, 0);
 
+    const sumaOtrosAssistentesSunday = dataAssistancesSundayPerArea.reduce((valorAnterior, valorActual) => {
+      return valorAnterior + valorActual;
+    }, 0);
+
     dataTotalInscriptionsPerArea.push(totalUsers-sumaOtros)
-    dataAssistancesPerArea.push(totalAssistancesUsers-sumaOtrosAssistentes)
+    dataAssistancesPerArea.push(totalAssistancesUsers-sumaOtrosAssistentes )
+    dataAssistancesSundayPerArea.push(totalAssistancesUsersSunday-sumaOtrosAssistentesSunday)
+
+
 
     const resultsGraphs = [
       {
         data: dataAssistancesPerArea, 
         labels: labelsAssistances   
+      }, {
+        data: dataAssistancesSundayPerArea,
+        labels: labelsAssistancesSunday
       },
       {
         data: dataTotalInscriptionsPerArea, 
